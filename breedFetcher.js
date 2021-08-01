@@ -1,40 +1,29 @@
 const request = require('request');
-const fs = require('fs');
-
 const breedName = process.argv[2]; //breed name entered by user
 const url = 'https://api.thecatapi.com/v1/breeds/search/?q=' + breedName;
-
-const path = './index.html';
 
 
 
 request(url, (error, response, body) => {
 
-  if (response.statusCode !== 200) {
-    console.log('there was an error');
-  }
+  
+  //test for if request failed.
+  if (response === undefined) {
 
-  //breed not found (invalid URL)
-  if (response.statusCode === 404) {
-    console.log(`The data you requested was not found`);
-  }
+    console.log('unable to fetch data.');
+    console.log(error);
+  } else {
 
-   // failed request
-
-
-  if (response.statusCode === 200) {
-
-    fs.writeFile(path, body, err => {
-
-      if (err) {
-        console.log(err);
-        return;
-      }
-
-      // body was successfully retrieved
+    if (response.statusCode === 200 && !error) {
       const data = JSON.parse(body);
+  
+      // Test for if breed is not found
+      if (!data[0]) {
+        console.log('\n the breed was not found.');
+      }
+  
       console.log(`description: ${data[0]['description']}`);
-    
-    });
+    }
   }
+  
 });
